@@ -9,15 +9,20 @@ terraform {
 
 provider "aws" {
   region     = "eu-west-2"
-  access_key = "AKIA5DBGIZFKO7LWNXXU"
-  secret_key = "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"
+  shared_credentials_file = "/home/shlomi/.aws/credentials"
+  profile                 =  "labos"
 }
 
+
+
+variable "ssh_allow_ip" {
+    description = "used with security group to all ingress ssh ip"
+}
 
 resource "aws_vpc" "dev-vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -27,7 +32,7 @@ resource "aws_subnet" "flask-restapi-app" {
   vpc_id     = aws_vpc.dev-vpc.id
   cidr_block = "10.0.1.0/24"
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -35,7 +40,7 @@ resource "aws_subnet" "flask-restapi-app" {
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.dev-vpc.id
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -54,7 +59,7 @@ resource "aws_route_table" "dev-routing-table" {
   }
 
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -83,7 +88,7 @@ resource "aws_security_group" "allow_web_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["147.235.215.40/32"]
+    cidr_blocks = [var.ssh_allow_ip]
   }
 
   egress {
@@ -95,7 +100,7 @@ resource "aws_security_group" "allow_web_ssh" {
   }
 
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -105,7 +110,10 @@ resource "aws_network_interface" "nic" {
   private_ips     = ["10.0.1.50"]
   security_groups = [aws_security_group.allow_web_ssh.id]
 
-
+  tags = {
+    "env"     = "assignment"
+    "creator" = "shlomi-tubul"
+  }
 }
 
 resource "aws_eip" "eip" {
@@ -118,7 +126,7 @@ resource "aws_eip" "eip" {
   ]
 
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -137,7 +145,7 @@ resource "aws_key_pair" "ec2-key-pair" {
   }
 
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 }
@@ -154,7 +162,7 @@ resource "aws_instance" "dev-server" {
 
 
   tags = {
-    "env"     = "dev"
+    "env"     = "assignment"
     "creator" = "shlomi-tubul"
   }
 
